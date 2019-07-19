@@ -18,7 +18,8 @@ int main(int argc, char** argv) {
                         "t", 
                         CLIParser::ARG_TYPE::NO_ARG, 
                         CLIParser::OPT_TYPE::REQUIRED_OPT });
-    argparse.AddParser("new", &options); 
+    argparse.AddParser("new", &options);
+    argparse.AddParser("noop", NULL); 
     argparse.Parse(argc, argv);
     for (int i = 0; i < options.size(); i++) {
         std::cout << options.at(i).longOpt << " ";

@@ -64,11 +64,13 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
             return;
         }
     }
-    for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
-        OPTION option = parserOptions[subParser]->at(i);
-        if (option.optType == REQUIRED_OPT && !option.flag) {
-            RequiredOptionError(&option);
-            return;
+    if (parserOptions[subParser] != NULL) {
+        for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
+            OPTION option = parserOptions[subParser]->at(i);
+            if (option.optType == REQUIRED_OPT && !option.flag) {
+                RequiredOptionError(&option);
+                return;
+            }
         }
     }
 }
@@ -123,9 +125,11 @@ bool CLIParser::ParseError() {
 }
 
 void CLIParser::ClearOutOptions(std::vector<OPTION>* parserOptions) {
-    for (unsigned int i = 0; i < parserOptions->size(); i++) {
-        parserOptions->at(i).flag = false;
-        parserOptions->at(i).result = "";
+    if (parserOptions != NULL) {
+        for (unsigned int i = 0; i < parserOptions->size(); i++) {
+            parserOptions->at(i).flag = false;
+            parserOptions->at(i).result = "";
+        }
     }
 }
 
