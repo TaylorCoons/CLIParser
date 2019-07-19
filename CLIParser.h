@@ -9,15 +9,21 @@ class CLIParser {
 public:
  
     enum ARG_TYPE {
-        NO_ARGUMENT,
-        REQUIRED_ARGUMENT,
-        OPTIONAL_ARGUMENT
+        NO_ARG,
+        REQUIRED_ARG,
+        OPTIONAL_ARG
+    };
+    
+    enum OPT_TYPE {
+        REQUIRED_OPT,
+        OPTIONAL_OPT
     };
 
     struct OPTION {
         std::string longOpt;
         std::string shortOpt;
         ARG_TYPE argType;
+        OPT_TYPE optType;
         bool flag;
         std::string result;
     };
@@ -39,6 +45,8 @@ private:
     void RequiredArgumentError(const OPTION* option);
 
     void NoArgumentError(const OPTION* option);
+
+    void RequiredOptionError(const OPTION* option);
 
     void InvalidOptionError(const std::string* option);
 

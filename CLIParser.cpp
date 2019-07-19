@@ -25,7 +25,7 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
         int optionIndex = OptionIndex(subParser, args->at(i));
         if (optionIndex != -1) {
             switch (parserOptions[subParser]->at(optionIndex).argType) {
-            case NO_ARGUMENT:
+            case NO_ARG:
                 if (i == args->size() - 1 
                     || (i != args->size() - 1 
                     && OptionIndex(subParser, args->at(i + 1)) != -1)) {
@@ -35,7 +35,7 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
                     error = true;
                 }
             break;
-            case OPTIONAL_ARGUMENT:
+            case OPTIONAL_ARG:
                 if (i != args->size() - 1 
                     && OptionIndex(subParser, args->at(i + 1)) == -1) {
                     parserOptions[subParser]->at(optionIndex).result = args->at(i+1);
@@ -43,7 +43,7 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
                 }
                 parserOptions[subParser]->at(optionIndex).flag = true;
             break;
-            case REQUIRED_ARGUMENT:
+            case REQUIRED_ARG:
                 if (i != args->size() - 1 
                     && OptionIndex(subParser, args->at(i + 1)) == -1) {
                     parserOptions[subParser]->at(optionIndex).result = args->at(i+1);
@@ -61,6 +61,13 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
         }
         if (error) {
             // Display usage
+            return;
+        }
+    }
+    for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
+        OPTION option = parserOptions[subParser]->at(i);
+        if (option.optType == REQUIRED_OPT && !option.flag) {
+            RequiredOptionError(&option);
             return;
         }
     }
@@ -98,6 +105,13 @@ void CLIParser::InvalidOptionError(const std::string* option) {
 
 void CLIParser::InvalidUseError() {
     std::cout << "Invalid Use" << std::endl;
+    parseError = true;
+}
+
+void CLIParser::RequiredOptionError(const OPTION* option) {
+    std::cout << "Option: " << option->longOpt << " (" << option->shortOpt << ")";
+    std::cout << " is required";
+    std::cout << std::endl;
     parseError = true;
 }
 
