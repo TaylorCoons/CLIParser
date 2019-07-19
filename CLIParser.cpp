@@ -64,13 +64,6 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
             return;
         }
     }
-    for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
-        if (parserOptions[subParser]->at(i).argType == REQUIRED_ARGUMENT
-            && parserOptions[subParser]->at(i).flag == false) {
-            MissingRequiredOptionError(&parserOptions[subParser]->at(i));
-        }
-    }
-    
 }
 
 int CLIParser::OptionIndex(std::string subParser, std::string option) {
@@ -103,13 +96,6 @@ void CLIParser::InvalidOptionError(const std::string* option) {
     parseError = true;
 }
 
-void CLIParser::MissingRequiredOptionError(const OPTION* option) {
-    std::cout << "Missing required option: " << option->longOpt;
-    std::cout << " (" << option->shortOpt << ")";
-    std::cout << std::endl;
-    parseError = true;
-}
-
 void CLIParser::InvalidUseError() {
     std::cout << "Invalid Use" << std::endl;
     parseError = true;
@@ -132,7 +118,7 @@ std::string CLIParser::Parse(int argc, char** argv) {
     Tokenize(argc, argv, &args);
     std::string subParser = "";
     if (args.size() > 0 && parserOptions.count(args.at(0))) {
-        std::string subParser = args.at(0);
+        subParser = args.at(0);
         args.erase(args.begin());
         SubParse(subParser, &args);
     } else if (parserOptions.count("")) {

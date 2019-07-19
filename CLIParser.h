@@ -42,8 +42,6 @@ private:
 
     void InvalidOptionError(const std::string* option);
 
-    void MissingRequiredOptionError(const OPTION* option);
-
     void InvalidUseError();
 
 public: 
