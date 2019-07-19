@@ -74,6 +74,9 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
 }
 
 int CLIParser::OptionIndex(std::string subParser, std::string option) {
+    if (parserOptions[subParser] == NULL) {
+        return -1;
+    }
     for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
         if (parserOptions[subParser]->at(i).longOpt == option
             || parserOptions[subParser]->at(i).shortOpt == option) {
