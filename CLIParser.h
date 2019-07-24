@@ -1,3 +1,4 @@
+#pragma once
 
 #include <map>
 #include <vector>
@@ -28,12 +29,21 @@ public:
         bool flag;
         std::string result;
     };
+   
+    enum ERROR {
+        OK,
+        ERROR_REQUIRED_ARG,
+        ERROR_NO_ARG,
+        ERROR_REQUIRED_OPT,
+        ERROR_INVALID_OPT,
+        ERROR_INVALID_USE
+    };
     
     using OPTIONS = std::map<std::string, OPTION>;
 
 private:
     std::map<std::string, OPTIONS*> parserOptions; 
-    bool parseError;
+    ERROR parseError;
 
 /* Functions */
 private:
@@ -66,7 +76,7 @@ public:
     
     std::string Parse(int argc, char** argv);
 
-    bool ParseError();
+    ERROR ParseError();
 
     ~CLIParser();
 

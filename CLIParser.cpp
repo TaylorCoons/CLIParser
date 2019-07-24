@@ -81,32 +81,32 @@ void CLIParser::RequiredArgumentError(const OPTION* option) {
     std::cout << "Option " << option->longOpt << " (" << option->shortOpt << ")";
     std::cout << " requires argument";
     std::cout << std::endl;
-    parseError = true;
+    parseError = ERROR_REQUIRED_ARG;
 }
 
 void CLIParser::NoArgumentError(const OPTION* option) {
     std::cout << "Option " << option->longOpt << " (" << option->shortOpt << ")";
     std::cout << " does not take arguments";
     std::cout << std::endl;
-    parseError = true;
+    parseError = ERROR_NO_ARG;
 }
 
 void CLIParser::InvalidOptionError(const std::string* option) {
     std::cout << "Unexpected option: " << *option;
     std::cout << std::endl;
-    parseError = true;
+    parseError = ERROR_INVALID_OPT;
 }
 
 void CLIParser::InvalidUseError() {
     std::cout << "Invalid Use" << std::endl;
-    parseError = true;
+    parseError = ERROR_INVALID_USE;
 }
 
 void CLIParser::RequiredOptionError(const OPTION* option) {
     std::cout << "Option: " << option->longOpt << " (" << option->shortOpt << ")";
     std::cout << " is required";
     std::cout << std::endl;
-    parseError = true;
+    parseError = ERROR_REQUIRED_OPT;
 }
 
 bool CLIParser::GetOptionFromTag(std::string subParser, 
@@ -125,7 +125,7 @@ bool CLIParser::GetOptionFromTag(std::string subParser,
     return false;
 }
 
-bool CLIParser::ParseError() {
+CLIParser::ERROR CLIParser::ParseError() {
     return parseError;
 }
 
@@ -140,7 +140,7 @@ void CLIParser::ClearOutOptions(OPTIONS* options) {
 }
 
 std::string CLIParser::Parse(int argc, char** argv) {
-    parseError = false;
+    parseError = ERROR::OK;
     std::vector<std::string> args;
     Tokenize(argc, argv, &args);
     std::string subParser = "";
