@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 
+
 class CLIParser {
 /* Variables */
 public:
@@ -27,9 +28,11 @@ public:
         bool flag;
         std::string result;
     };
+    
+    using OPTIONS = std::map<std::string, OPTION>;
 
 private:
-    std::map<std::string, std::vector<OPTION>*> parserOptions; 
+    std::map<std::string, OPTIONS*> parserOptions; 
     bool parseError;
 
 /* Functions */
@@ -38,9 +41,7 @@ private:
 
     void SubParse(std::string subParser, std::vector<std::string>* args);
 
-    int OptionIndex(std::string subParser, std::string option);
-
-    void ClearOutOptions(std::vector<OPTION>* parserOptions);
+    void ClearOutOptions(OPTIONS* options);
 
     void RequiredArgumentError(const OPTION* option);
 
@@ -52,11 +53,16 @@ private:
 
     void InvalidUseError();
 
+    bool GetOptionFromTag(std::string subParser,
+                          std::string tag, 
+                          std::string* optionName = NULL);
+    
+
 public: 
    
     CLIParser();
     
-    void AddParser(std::string subParser, std::vector<OPTION>* options);
+    void AddParser(std::string subParser, OPTIONS* options);
     
     std::string Parse(int argc, char** argv);
 

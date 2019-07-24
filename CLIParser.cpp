@@ -3,7 +3,7 @@
 CLIParser::CLIParser() {    
 }
 
-void CLIParser::AddParser(std::string subParser, std::vector<OPTION>* options) {
+void CLIParser::AddParser(std::string subParser, OPTIONS* options) {
     ClearOutOptions(options);
     if (subParser == "") {
         parserOptions[""] = options; 
@@ -21,38 +21,39 @@ void CLIParser::Tokenize(int argc, char** argv, std::vector<std::string>* args) 
 
 void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) {
     bool error = false;
+    OPTIONS* options = parserOptions[subParser];
     for (unsigned int i = 0; i < args->size(); i++) {
-        int optionIndex = OptionIndex(subParser, args->at(i));
-        if (optionIndex != -1) {
-            switch (parserOptions[subParser]->at(optionIndex).argType) {
+        std::string optionName = "";
+        if (GetOptionFromTag(subParser, args->at(i), &optionName)) {
+            switch (options->at(optionName).argType) {
             case NO_ARG:
                 if (i == args->size() - 1 
                     || (i != args->size() - 1 
-                    && OptionIndex(subParser, args->at(i + 1)) != -1)) {
-                    parserOptions[subParser]->at(optionIndex).flag = true;
+                    && GetOptionFromTag(subParser, args->at(i + 1)))) {
+                    options->at(optionName).flag = true;
                 } else {
-                    NoArgumentError(&parserOptions[subParser]->at(optionIndex));
+                    NoArgumentError(&options->at(optionName));
                     error = true;
                 }
             break;
             case OPTIONAL_ARG:
                 if (i != args->size() - 1 
-                    && OptionIndex(subParser, args->at(i + 1)) == -1) {
-                    parserOptions[subParser]->at(optionIndex).result = args->at(i+1);
+                    && !GetOptionFromTag(subParser, args->at(i + 1))) {
+                    options->at(optionName).result = args->at(i + 1);
                     i++;
                 }
-                parserOptions[subParser]->at(optionIndex).flag = true;
+                options->at(optionName).flag = true;
             break;
             case REQUIRED_ARG:
                 if (i != args->size() - 1 
-                    && OptionIndex(subParser, args->at(i + 1)) == -1) {
-                    parserOptions[subParser]->at(optionIndex).result = args->at(i+1);
+                    && !GetOptionFromTag(subParser, args->at(i + 1))) {
+                    options->at(optionName).result = args->at(i + 1);
                     i++;
                 } else {
-                    RequiredArgumentError(&parserOptions[subParser]->at(optionIndex));
+                    RequiredArgumentError(&options->at(optionName));
                     error = true;
                 }
-                parserOptions[subParser]->at(optionIndex).flag = true;
+                options->at(optionName).flag = true;
             break;
             }
         } else {
@@ -64,28 +65,16 @@ void CLIParser::SubParse(std::string subParser, std::vector<std::string>* args) 
             return;
         }
     }
-    if (parserOptions[subParser] != NULL) {
-        for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
-            OPTION option = parserOptions[subParser]->at(i);
+    if (options != NULL) {
+        OPTIONS::iterator it;
+        for (it = options->begin(); it != options->end(); it++) {
+            OPTION option = it->second;
             if (option.optType == REQUIRED_OPT && !option.flag) {
                 RequiredOptionError(&option);
                 return;
             }
         }
     }
-}
-
-int CLIParser::OptionIndex(std::string subParser, std::string option) {
-    if (parserOptions[subParser] == NULL) {
-        return -1;
-    }
-    for (unsigned int i = 0; i < parserOptions[subParser]->size(); i++) {
-        if (parserOptions[subParser]->at(i).longOpt == option
-            || parserOptions[subParser]->at(i).shortOpt == option) {
-            return i;
-        }
-    }
-    return -1;
 }
 
 void CLIParser::RequiredArgumentError(const OPTION* option) {
@@ -120,15 +109,32 @@ void CLIParser::RequiredOptionError(const OPTION* option) {
     parseError = true;
 }
 
+bool CLIParser::GetOptionFromTag(std::string subParser, 
+                                 std::string tag,
+                                 std::string* optionName) {
+    OPTIONS* options = parserOptions.at(subParser);
+    OPTIONS::iterator it;
+    for (it = options->begin(); it != options->end(); it++) {
+        if (it->second.longOpt == tag || it->second.shortOpt == tag) {
+            if (optionName != NULL) {
+                *optionName = it->first;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CLIParser::ParseError() {
     return parseError;
 }
 
-void CLIParser::ClearOutOptions(std::vector<OPTION>* parserOptions) {
-    if (parserOptions != NULL) {
-        for (unsigned int i = 0; i < parserOptions->size(); i++) {
-            parserOptions->at(i).flag = false;
-            parserOptions->at(i).result = "";
+void CLIParser::ClearOutOptions(OPTIONS* options) {
+    if (options != NULL) {
+        OPTIONS::iterator it;
+        for (it = options->begin(); it != options->end(); it++) {
+            it->second.flag = false;
+            it->second.result = "";
         }
     }
 }
