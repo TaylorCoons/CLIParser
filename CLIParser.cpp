@@ -99,6 +99,15 @@ void CLIParser::InvalidOptionError(const std::string* option) {
 
 void CLIParser::InvalidUseError() {
     std::cout << "Invalid Use" << std::endl;
+    std::cout << "Subcommands are: ";
+    std::map<std::string, OPTIONS*>::iterator it;
+    for (it = parserOptions.begin(); it != parserOptions.end(); it++) {
+        std::cout << it->first;
+        if (!((it != parserOptions.end()) && (it == --parserOptions.end()))) {
+            std::cout << ", ";
+        }
+    }    
+    std::cout << std::endl; 
     parseError = true;
 }
 
